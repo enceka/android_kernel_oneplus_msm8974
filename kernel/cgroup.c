@@ -2654,6 +2654,11 @@ int cgroup_add_file(struct cgroup *cgrp,
 		strcpy(name, subsys->name);
 		strcat(name, ".");
 	}
+	if (cft->ss && (cgrp->root->flags & CGRP_ROOT_NOPREFIX) && !(cft->flags & CFTYPE_NO_PREFIX)) {
+			snprintf(name, CGROUP_FILE_NAME_MAX, "%s.%s", cft->ss->name, cft->name);
+			kernfs_create_link(cgrp->kn, name, kn);
+	}
+ 
 	strcat(name, cft->name);
 	BUG_ON(!mutex_is_locked(&dir->d_inode->i_mutex));
 	dentry = lookup_one_len(name, dir, strlen(name));
